@@ -64,9 +64,11 @@ class PerchAPIClient(object):
     ROOT_URL = 'https://api.perchsecurity.com'
     AUTH_ENDPOINT = '/auth/access_token'
 
-    def __init__(self, root_url=ROOT_URL, **kwargs):
+    def __init__(self, endpoints=ENDPOINTS, root_url=ROOT_URL, **kwargs):
         self.headers = {}
-        credentials = ('username', 'password', 'api_key',)
+        self.endpoints = endpoints
+        self.root_url = root_url
+        credentials = ('username', 'password',)
         for cred in credentials:
             cred_arg = kwargs.get(cred)
             if not cred_arg:
@@ -76,7 +78,7 @@ class PerchAPIClient(object):
         self.setup_endpoints()
 
     def setup_endpoints(self):
-        for endpoint in ENDPOINTS:
+        for endpoint in self.endpoints:
             setattr(self, endpoint['name'], EndpointCrud(self, **endpoint))
 
     @property
@@ -84,11 +86,10 @@ class PerchAPIClient(object):
         return {
             'username': self.username,
             'password': self.password,
-            'api_key': self.api_key
         }
 
     def authenticate(self):
-        auth_url = self.ROOT_URL + self.AUTH_ENDPOINT
+        auth_url = self.root_url + self.AUTH_ENDPOINT
         res = requests.post(auth_url, json=self.auth_payload)
         body = json.loads(res.json())
         self.headers['Authorization'] = 'Bearer {}'.format(body['access_token'])
