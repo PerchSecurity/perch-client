@@ -33,20 +33,21 @@ class DescribeApiClient(object):
         with pytest.raises(TypeError):
             PerchAPIClient(username='username')
 
-    def it_formats_auth_payload(self):
+    @mock.patch('perch.main.requests.post', side_effect=mock_auth)
+    def it_formats_auth_payload(self, mocked_auth):
         perch = PerchAPIClient(username='username', password='password')
         payload = perch.auth_payload
 
         assert payload['username'] == 'username'
         assert payload['password'] == 'password'
 
-    @mock.patch('perch.requests.post', side_effect=mock_auth)
-    def it_sets_auth_headers(self):
+    @mock.patch('perch.main.requests.post', side_effect=mock_auth)
+    def it_sets_auth_headers(self, mocked_auth):
         perch = PerchAPIClient(username='username', password='password')
         assert perch.headers['Authorization'] == 'Bearer 858598cd-842f-4590-8c06-0f31ee2ee012'
 
-    @mock.patch('perch.requests.post', side_effect=mock_auth)
-    def it_adds_endpoints(self):
+    @mock.patch('perch.main.requests.post', side_effect=mock_auth)
+    def it_adds_endpoints(self, mocked_auth):
         perch = PerchAPIClient(username='username', password='password')
         for endpoint in ENDPOINTS:
             assert getattr(perch, endpoint['name']) is not None
@@ -63,11 +64,11 @@ class DescribeApiClient(object):
 
         mock_endpoint = {
             'name': 'mock',
-            'path': 'mock/:id',
+            'path': '/mock/:id',
             'verbs': ('GET',)
         }
 
-        endpoint_crud = EndpointCrud(MockAPI(), mock_endpoint)
+        endpoint_crud = EndpointCrud(MockAPI(), **mock_endpoint)
         assert endpoint_crud.build_url('GET') == 'http://api.local.perchweb.com/mock'
         assert endpoint_crud.build_url('GET', id=3) == 'http://api.local.perchweb.com/mock/3'
 
@@ -77,11 +78,11 @@ class DescribeApiClient(object):
 
         mock_endpoint = {
             'name': 'mock',
-            'path': 'mock/:id/endpoint',
+            'path': '/mock/:id/endpoint',
             'verbs': ('DELETE', 'PUT')
         }
 
-        endpoint_crud = EndpointCrud(MockAPI(), mock_endpoint)
+        endpoint_crud = EndpointCrud(MockAPI(), **mock_endpoint)
         with pytest.raises(TypeError):
             endpoint_crud.build_url('DELETE')
 
