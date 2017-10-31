@@ -1,0 +1,13 @@
+{
+  "file": "",
+  "column_map": {
+    "id": 0,
+    "title": 1,
+    "description": 2,
+    "tlp": 3,
+    "confidence": 4,
+    "observable_type": 5,
+    "observable_value": 6
+  },
+  "communities": []
+}

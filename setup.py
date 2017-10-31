@@ -14,6 +14,10 @@ setup(
     description='Perch Security python client and command line tools',
     long_description='Perch Security python client and command line tools',
     install_requires=['click', 'requests'],
+    entry_points='''
+        [console_scripts]
+        perch=perch.cli:cli
+    ''',
     classifiers=[
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.5',
