@@ -44,7 +44,7 @@ def get_observable_type(reported_type):
         return 0
     if 'domain' in reported_type:
         return 1
-    if 'url' in reported_type:
+    if 'url' in reported_type or 'http uri' in reported_type:
         return 2
     if 'file' in reported_type:
         return 4
@@ -54,6 +54,9 @@ def get_observable_type(reported_type):
 def get_observable_value(obs_type, row):
     if obs_type == 4:
         return row[COLUMNS['observable_file_hash']]
+    if obs_type == 2:
+        value = row[COLUMNS['observable_type']]
+        return value.strip().split(' ')[-1]
     return row[COLUMNS['observable_value']]
 
 
