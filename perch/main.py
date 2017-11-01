@@ -53,7 +53,6 @@ class EndpointCrud(CrudBase):
         url = self.build_url(req.__name__, **kwargs)
         res = req(url, headers=self.api.headers, json=kwargs)
         if not str(res.status_code).startswith('2'):
-            import ipdb; ipdb.set_trace();
             raise RuntimeError('Squwaaaak! The api returned an error!\n{}\n'.format(res.reason))
         body = res.json()
         return body
