@@ -38,7 +38,7 @@ class EndpointCrud(CrudBase):
 
     def build_url(self, verb, **kwargs):
         path = self.path
-        params = re.findall(':(.[a-z]*)/*', path)
+        params = re.findall(':(.[a-z+_]*)/*', path)
         for param in params:
             arg = str(kwargs.get(param, ''))
             if not arg:
@@ -52,6 +52,9 @@ class EndpointCrud(CrudBase):
     def make_request(self, req, **kwargs):
         url = self.build_url(req.__name__, **kwargs)
         res = req(url, headers=self.api.headers, json=kwargs)
+        if not str(res.status_code).startswith('2'):
+            import ipdb; ipdb.set_trace();
+            raise RuntimeError('Squwaaaak! The api returned an error!\n{}\n'.format(res.reason))
         body = res.json()
         return body
 
@@ -92,6 +95,8 @@ class PerchAPIClient(object):
     def authenticate(self):
         auth_url = self.root_url + self.AUTH_ENDPOINT
         res = requests.post(auth_url, json=self.auth_payload)
+        if res.status_code != 200:
+            raise RuntimeError("Squwaaaakkk! Invalid login credentials!")
         body = res.json()
         self.headers['Authorization'] = 'Bearer {}'.format(body['access_token'])
         return res

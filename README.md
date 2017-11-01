@@ -10,6 +10,10 @@ A python client and CLI for Perch Security API
 - Do things
 
 
+## Development
+- `pip install -e` enables the cli
+
+
 ## TODO: Do These Things
 - Currently doesn't support query parameters for filtering
 
