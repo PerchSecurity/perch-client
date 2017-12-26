@@ -16,7 +16,7 @@ setup(
     install_requires=['click', 'requests'],
     entry_points='''
         [console_scripts]
-        perch=perch.cli:cli
+        perch=perch.main:cli
     ''',
     classifiers=[
         'Programming Language :: Python :: 2.7',

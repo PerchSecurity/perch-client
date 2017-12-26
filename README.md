@@ -1,5 +1,5 @@
 # perch-client
-A python client and CLI for Perch Security API
+A CLI for Perch Security
 
 
 ## Requirements
@@ -7,13 +7,12 @@ A python client and CLI for Perch Security API
 
 
 ## Installation
-- Do things
+- `pip install perch`
+
+## Usage
+- `perch upload_indicators_csv <path-to-csv>`
 
 
 ## Development
-- `pip install -e` enables the cli
-
-
-## TODO: Do These Things
-- Currently doesn't support query parameters for filtering
+- `pip install -e .` enables the cli
 
