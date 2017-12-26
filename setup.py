@@ -3,7 +3,7 @@ from perch import __version__
 
 
 setup(
-    name='perch security',
+    name='perch',
     version=__version__,
     author='Nick Hagianis',
     author_email='dev@perchsecurity.com',
