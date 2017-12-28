@@ -13,7 +13,7 @@ setup(
     license='MIT',
     description='Perch Security python client and command line tools',
     long_description='Perch Security python client and command line tools',
-    install_requires=['click', 'requests'],
+    install_requires=['click', 'requests', 'unicodecsv'],
     entry_points='''
         [console_scripts]
         perch=perch.main:cli

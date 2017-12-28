@@ -1,7 +1,12 @@
+from __future__ import unicode_literals
+
 import click
 import csv
 import json
 import requests
+import sys
+import unicodecsv
+
 
 from .settings import ROOT_URL
 
@@ -82,10 +87,11 @@ def get_hash_type(row):
 
 
 def readrows(indicator_file):
-    contents = indicator_file.readlines()
-    if len(contents) <= 1:
-        contents = contents[0].split('\r')
-    for row in csv.reader(contents, quotechar='"'):
+    if sys.version_info[0] < 3:
+        rows = unicodecsv.reader(indicator_file, encoding='utf-8', dialect=csv.excel_tab, delimiter=b',', quotechar=b'"')
+    else:
+        rows = csv.reader(indicator_file, dialect=csv.excel_tab, delimiter=',', quotechar='"')
+    for row in rows:
         yield row
 
 
@@ -157,7 +163,7 @@ def cli(ctx):
 
 
 @cli.command()
-@click.argument('indicator_file', type=click.File('r'))
+@click.argument('indicator_file', type=click.File('rU'))
 @click.option('--api_key', type=click.STRING, prompt=True)
 @click.option('--username', type=click.STRING, prompt=True)
 @click.option('--password', type=click.STRING, prompt=True)
