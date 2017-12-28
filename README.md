@@ -16,3 +16,6 @@ A CLI for Perch Security
 ## Development
 - `pip install -e .` enables the cli
 
+## Build and Release
+- `python setup.py bdist_wheel`
+- `twine upload dist/*`
