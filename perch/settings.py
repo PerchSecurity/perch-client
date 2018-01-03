@@ -1,5 +1,10 @@
 import os
 
+# Suppress warnings in python2
+import warnings
+warnings.filterwarnings("ignore")
+
+
 PERCH_ENV = os.environ.get('PERCH_ENV', 'prod')
 
 ROOT_URL = 'https://api.perch.rocks/v1'
