@@ -88,7 +88,7 @@ def get_hash_type(row):
 
 def readrows(indicator_file):
     if sys.version_info[0] < 3:
-        rows = unicodecsv.reader(indicator_file, encoding='utf-8', dialect=csv.excel_tab, delimiter=b',', quotechar=b'"')
+        rows = unicodecsv.reader(indicator_file, dialect=csv.excel_tab, delimiter=b',', quotechar=b'"')
     else:
         rows = csv.reader(indicator_file, dialect=csv.excel_tab, delimiter=',', quotechar='"')
     for row in rows:
@@ -108,11 +108,24 @@ def build_indicator(row, company_id=None, communities=[]):
     observable_value = get_observable_value(observable_type, row)
     if not observable_value:
         return None, 'No observable value found'
+
+    tlp_key = row[COLUMNS['tlp']]
+    try:
+        tlp = TLP[tlp_key.upper()]
+    except KeyError:
+        return None, '"{}" is not a valid TLP option. Options are: {}, {}, {}'.format(tlp_key, *TLP.keys())
+
+    confidence_key = row[COLUMNS['confidence']]
+    try:
+        confidence = CONFIDENCE[confidence_key.upper()]
+    except KeyError:
+        return None, '"{}" is not a valid Confidence option. Options are: {}, {}, {}'.format(confidence_key, *CONFIDENCE.keys())
+
     indicator = {
         'title': row[COLUMNS['title']],
-        'tlp': TLP[row[COLUMNS['tlp']]],
+        'tlp': tlp,
         'description': row[COLUMNS['description']],
-        'confidence': CONFIDENCE[row[COLUMNS['confidence']]],
+        'confidence': confidence,
         'observables': [{
             'type': observable_type,
             'details': {'value': observable_value}
