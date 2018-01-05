@@ -8,7 +8,7 @@ import sys
 import unicodecsv
 
 
-from .settings import ROOT_URL
+from .settings import INDICATOR_CHUNK_SIZE, ROOT_URL
 
 
 COLUMNS = {
@@ -185,14 +185,22 @@ def upload_indicators_csv(ctx, indicator_file, api_key, username, password):
     headers = authenticate(ctx, api_key, username, password)
     validate_csv(ctx, indicator_file)
     community_ids = prompt_for_communities(ctx, headers)
-    req_body = []
+    req_bodies = []
     bad_rows = []
+    chunk = []
+
     for index, row in enumerate(readrows(indicator_file)):
         indicator, error_message = build_indicator(row, communities=community_ids)
         if indicator:
-            req_body.append(indicator)
+            chunk.append(indicator)
+            if len(chunk) >= INDICATOR_CHUNK_SIZE:
+                req_bodies.append(chunk)
+                chunk = []
         else:
             bad_rows.append({'row': index + 1, 'reason': error_message, 'data': row})
+
+    if chunk:
+        req_bodies.append(chunk)
 
     if bad_rows:
         msg = 'The following rows are not valid: \n'
@@ -203,13 +211,21 @@ def upload_indicators_csv(ctx, indicator_file, api_key, username, password):
 
     click.echo('Uploading...')
     url = ROOT_URL + '/indicators'
-    res = requests.post(url, data=json.dumps(req_body), headers=headers)
-    if res.status_code == 400:
-        click.echo('Upload failed. Please correct the following rows and try again. \n\n {}'.format(res.content))
-        ctx.abort()
 
-    if res.status_code != 201:
-        click.echo('Server Error: {}'.format(res.status_code))
-        ctx.abort()
+    # TODO: Make this use a progress bar. Click has support.
+    for req_body in req_bodies:
+        res = requests.post(url, data=json.dumps(req_body), headers=headers)
+        """ TODO: This creates a bad scenario where if the first chunk is successful, and a subsequent chunk fails,
+         it prompts the user to fix it and re-upload, which will result in duplication of the first chunk. I don't know
+         how to fix this easily. The endpoint should probably accept and validate all the data, respond, and then queue
+         a job to INSERT the data into the db in the background.
+        """
+        if res.status_code == 400:
+            click.echo('Upload failed. Please correct the following rows and try again. \n\n {}'.format(res.content))
+            ctx.abort()
+        if res.status_code != 201:
+            click.echo('Server Error: {}'.format(res.status_code))
+            ctx.abort()
+        click.echo('Working...')
 
     click.echo('Upload Successful!')
