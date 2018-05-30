@@ -71,7 +71,10 @@ def get_hash_type(row):
         hash_type = None
 
     if hash_type:
-        return hash_type
+        try:
+            return FILE_HASH_TYPES[hash_type]
+        except KeyError:
+            return False
 
     file_hash = row[COLUMNS['observable_value']]
     hash_len = len(file_hash)
