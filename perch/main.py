@@ -8,7 +8,7 @@ import sys
 import unicodecsv
 
 
-from .settings import INDICATOR_CHUNK_SIZE, ROOT_URL
+from .settings import INDICATOR_CHUNK_SIZE, PERCH_ENV, PYPI_URL, ROOT_URL
 from .version import __version__
 
 
@@ -44,16 +44,27 @@ FILE_HASH_TYPES = {
 
 
 def check_version(ctx):
-    pypi_url = 'https://pypi.org/pypi/perch/json'
-    res = requests.get(pypi_url)
+    # Don't bother checking in dev mode
+    if PERCH_ENV == 'DEV':
+        return True
+
+    res = requests.get(PYPI_URL)
+
+    # In case PyPi is down we don't want to halt
+    if res.status_code != 200:
+        return True
+
     pypi_info = res.json()
     latest_version = pypi_info['info']['version']
-    if __version__ != latest_version:
-        click.echo(
-            message='Your perch client is out of date! Please upgrade your client using: pip install perch -U',
-            err=True
-        )
+
+    versions_match = __version__ == latest_version
+
+    if not versions_match:
+        message = 'Your perch client is out of date! Please upgrade your client using:\r\n\r\n    pip install perch -U\r\n'
+        click.echo(message=message, err=True)
         ctx.abort()
+
+    return versions_match
 
 
 def get_observable_type(reported_type):
