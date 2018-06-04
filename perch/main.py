@@ -9,6 +9,7 @@ import unicodecsv
 
 
 from .settings import INDICATOR_CHUNK_SIZE, ROOT_URL
+from .version import __version__
 
 
 COLUMNS = {
@@ -40,6 +41,19 @@ FILE_HASH_TYPES = {
     'SHA224': 2,
     'SHA256': 3
 }
+
+
+def check_version(ctx):
+    pypi_url = 'https://pypi.org/pypi/perch/json'
+    res = requests.get(pypi_url)
+    pypi_info = res.json()
+    latest_version = pypi_info['info']['version']
+    if __version__ != latest_version:
+        click.echo(
+            message='Your perch client is out of date! Please upgrade your client using: pip install perch -U',
+            err=True
+        )
+        ctx.abort()
 
 
 def get_observable_type(reported_type):
@@ -173,8 +187,10 @@ def prompt_for_communities(ctx, headers):
 
 
 @click.group()
+@click.version_option(version=__version__)
 @click.pass_context
 def cli(ctx):
+    check_version(ctx)
     pass
 
 
