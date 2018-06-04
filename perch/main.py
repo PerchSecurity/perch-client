@@ -72,7 +72,7 @@ def get_hash_type(row):
 
     if hash_type:
         try:
-            return FILE_HASH_TYPES[hash_type]
+            return FILE_HASH_TYPES[hash_type.upper()]
         except KeyError:
             return False
 
