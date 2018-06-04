@@ -15,7 +15,10 @@ A CLI for Perch Security
 
 
 ## Development
-- `pip install -e .` enables the cli
+- Create a virtual env for the project `python3 -m venv /path/to/new/virtual/environment`
+- Sym link the `activate` script created at `/path/to/new/virtual/environment/bin` to the project folder
+- Add `export PERCH_ENV="DEV"` to the `activate` script. You could also set this to `QA` if you want to point at the QA server.
+- `pip uninstall perch` then `pip install -e .` enables the `perch` command in your dev environment.
 
 ## Build and Release
 - `python setup.py bdist_wheel`
