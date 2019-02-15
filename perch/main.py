@@ -187,7 +187,7 @@ def prompt_for_communities(ctx, headers):
     url = ROOT_URL + '/communities'
     res = requests.get(url, headers=headers)
     if not res.status_code == 200:
-        click.echo('API ERROR: {}'.format(res.content))
+        click.echo('API ERROR: {}'.format(res.text))
         ctx.abort()
     communities = res.json()['results']
     msg = 'Please enter the community id\'s that you want to share with separated by a comma: \n'
@@ -251,7 +251,7 @@ def upload_indicators_csv(ctx, indicator_file, api_key, username, password):
          a job to INSERT the data into the db in the background.
         """
         if res.status_code == 400:
-            click.echo('Upload failed. Please correct the following rows and try again. \n\n {}'.format(res.content))
+            click.echo('Upload failed. Please correct the following rows and try again. \n\n {}'.format(res.text))
             ctx.abort()
         if res.status_code != 201:
             click.echo('Server Error: {}'.format(res.status_code))
